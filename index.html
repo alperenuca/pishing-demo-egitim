@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Güvenli Giriş - Demo</title>
     <style>
         * {
@@ -44,136 +44,6 @@
             padding: 0;
             background: #f8f9fa;
             min-height: 100vh;
-        }
-
-        /* Tablet Responsive */
-        @media (max-width: 1024px) {
-            .sidebar {
-                width: 280px;
-            }
-            
-            .main-content {
-                margin-left: 280px;
-            }
-            
-            .content-header {
-                padding: 20px 24px;
-            }
-            
-            .content-body {
-                padding: 24px;
-            }
-        }
-
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .page-container {
-                flex-direction: column;
-            }
-            
-            .sidebar {
-                position: relative;
-                width: 100%;
-                height: auto;
-                border-right: none;
-                border-bottom: 1px solid #dadce0;
-            }
-            
-            .main-content {
-                margin-left: 0;
-            }
-            
-            .content-header {
-                padding: 16px 20px;
-                flex-direction: column;
-                gap: 12px;
-                align-items: flex-start;
-            }
-            
-            .header-left {
-                flex-direction: column;
-                gap: 8px;
-            }
-            
-            .content-body {
-                padding: 16px 20px;
-            }
-            
-            .container {
-                margin-bottom: 16px;
-            }
-            
-            .section-header {
-                padding: 20px 20px 12px 20px;
-            }
-            
-            .section-content {
-                padding: 20px;
-            }
-            
-            .form-row {
-                flex-direction: column;
-                gap: 0;
-            }
-            
-            .button-group {
-                flex-direction: column;
-                gap: 8px;
-            }
-            
-            .btn {
-                width: 100%;
-            }
-            
-            .security-alert {
-                margin: 16px 0;
-                padding: 12px;
-            }
-            
-            .alert-content h3 {
-                font-size: 13px;
-            }
-            
-            .alert-content p {
-                font-size: 12px;
-            }
-        }
-
-        /* Small Mobile */
-        @media (max-width: 480px) {
-            .content-header {
-                padding: 12px 16px;
-            }
-            
-            .content-body {
-                padding: 12px 16px;
-            }
-            
-            .section-header {
-                padding: 16px 16px 8px 16px;
-            }
-            
-            .section-content {
-                padding: 16px;
-            }
-            
-            .form-group input {
-                padding: 12px 12px;
-                font-size: 16px; /* iOS zoom'u önlemek için */
-            }
-            
-            .btn {
-                padding: 14px 20px;
-                font-size: 16px;
-            }
-            
-            .page-title {
-                font-size: 24px;
-            }
-            
-            .section-title {
-                font-size: 16px;
-            }
         }
 
         .sidebar-header {
@@ -495,6 +365,7 @@
             transition: all 0.2s;
             background: #fff;
             box-sizing: border-box;
+            max-width: 100%;
         }
 
         .form-group input:focus {
@@ -945,14 +816,21 @@
             console.log('URL:', window.location.href);
             console.log('Tam log objesi:', JSON.stringify(logData, null, 2));
             
-            // Vercel Function'a gönder (isteğe bağlı)
+            // Vercel Function'a gönder
             fetch('/api/log', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(logData)
-            }).catch(err => console.log('Log gönderilemedi:', err));
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Log başarıyla gönderildi:', data);
+            })
+            .catch(err => {
+                console.log('Log gönderilemedi:', err);
+            });
             
             alert('⚠️ EĞİTİM DEMOSU\n\nBu bir phishing simülasyonudur.\n\nGerçek hayatta bu tür siteler:\n- Hesap güvenliği uyarıları gösterir\n- Aciliyet duygusu yaratır\n- Şifre değiştirme formları sunar\n- Şifre gücü göstergeleri ekler\n- Kullanıcı bilgilerini çalar\n- Kimlik hırsızlığı yapar\n- Finansal zarara neden olur\n\nBu tür uyarılar gördüğünüzde:\n- URL\'yi mutlaka kontrol edin\n- Resmi siteye doğrudan gidin\n- Şüpheli bağlantılara tıklamayın!\n\nÖğrencileriniz gerçekten şaşıracak! 🎓');
         });
